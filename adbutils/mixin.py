@@ -324,6 +324,57 @@ class ShellMixin(object):
         horizontal = self.rotation() % 2 == 1
         return WindowSize(l, s) if horizontal else WindowSize(s, l)
 
+    def start_activity(self, component: str, extras: list = None):
+        """
+        start an Activity with "am start"
+        :param component:
+        :param extras: Any extra data.
+         each item must be a dict the following properties:
+        'key': The key name.
+        'type': The type, which can be one of 'bool', 'uri','component',
+                'string', 'string_array', 'string_list',
+                'int', 'int_array', 'int_list',
+                'long', 'long_array', 'long_list',
+                'float', 'float_array', 'float_list'.
+        'value': The value string.
+         :return:
+        """
+        command = ['am', 'start', '-n', component]
+        if extras:
+            for extra_item in extras:
+                if extra_item['type'] == 'string':
+                    command.extend(['--es', extra_item['key'], '\'{}\''.format(extra_item['value'])])
+                elif extra_item['type'] == 'string_array':
+                    command.extend(['--esa', extra_item['key'], '\\,'.join(extra_item['value'])])
+                elif extra_item['type'] == 'string_list':
+                    command.extend(['--esal', extra_item['key'], '\\,'.join(extra_item['value'])])
+                elif extra_item['type'] == 'int':
+                    command.extend(['--ei', extra_item['key'], extra_item['value']])
+                elif extra_item['type'] == 'int_array':
+                    command.extend(['--eia', extra_item['key'], '\\,'.join(extra_item['value'])])
+                elif extra_item['type'] == 'int_list':
+                    command.extend(['--eial', extra_item['key'], '\\,'.join(extra_item['value'])])
+                elif extra_item['type'] == 'long':
+                    command.extend(['--el', extra_item['key'], extra_item['value']])
+                elif extra_item['type'] == 'long_array':
+                    command.extend(['--ela', extra_item['key'], '\\,'.join(extra_item['value'])])
+                elif extra_item['type'] == 'long_list':
+                    command.extend(['--elal', extra_item['key'], '\\,'.join(extra_item['value'])])
+                elif extra_item['type'] == 'float':
+                    command.extend(['--ef', extra_item['key'], extra_item['value']])
+                elif extra_item['type'] == 'float_array':
+                    command.extend(['--efa', extra_item['key'], '\\,'.join(extra_item['value'])])
+                elif extra_item['type'] == 'float_list':
+                    command.extend(['--efal', extra_item['key'], '\\,'.join(extra_item['value'])])
+                elif extra_item['type'] == 'bool':
+                    command.extend(['--ez', extra_item['key'], extra_item['value']])
+                elif extra_item['type'] == 'uri':
+                    command.extend(['--eu', extra_item['key'], extra_item['value']])
+                elif extra_item['type'] == 'component':
+                    command.extend(['--ecn', extra_item['key'], extra_item['value']])
+
+        self._run(command)
+
     def app_start(self, package_name: str, activity: str = None):
         """ start app with "am start" or "monkey"
         """
